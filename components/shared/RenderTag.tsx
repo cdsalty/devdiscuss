@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import React from 'react';
+import { Badge } from '../ui/badge';
 
 interface RenderTagProps {
   _id: number;
@@ -14,11 +16,19 @@ const RenderTag = ({
   showCount,
 }: RenderTagProps) => {
   return (
-    <div>
-      {name} - {totalQuestions}
-      {/* 13:42 mark */}
-      {/* https://courses.jsmastery.pro/course/ultimate-nextjs/011_sidebar/004_rightsidebar-component */}
-    </div>
+    <Link
+      href={`/tags/${_id}`}
+      key={_id}
+      className="flex justify-between gap-2"
+    >
+      <Badge className="subtle-medium background-light800_dark300 text-light400_light500 rounded-md border-none px-4 py-2 uppercase">
+        {name}
+      </Badge>
+      {/* //TODO: Evaluate and determine if totalQuestions should be inside the badge */}
+      {showCount && (
+        <p className="small-medium text-dark500_light700">{totalQuestions}</p>
+      )}
+    </Link>
   );
 };
 
