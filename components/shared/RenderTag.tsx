@@ -3,7 +3,7 @@ import React from 'react';
 import { Badge } from '../ui/badge';
 
 interface RenderTagProps {
-  _id: number;
+  _id: string;
   name: string;
   totalQuestions?: number;
   showCount?: boolean;
@@ -68,5 +68,5 @@ After the boilerplate, the process:
       <div>{name} - {totalQuestions}</div>
 
 
-      THAT'S IT! You've successfully created a reusable component that can be used to render tags in the application.
+      THAT'S IT!
 */
