@@ -17,6 +17,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '../ui/input';
 import { QuestionsSchema } from '@/lib/validations';
+import { Badge } from '../ui/badge';
+import Image from 'next/image';
 
 const Question = () => {
   // Establish a reference to the editor.
@@ -38,6 +40,36 @@ const Question = () => {
     // ✅ This will be type-safe and validated.
     console.log(values);
   }
+
+  const handleInputKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    field: any
+  ) => {
+    if (e.key === 'Enter' && field.name === 'tags') {
+      e.preventDefault();
+
+      const tagInput = e.target as HTMLInputElement; // This is necessary because the target of the event is of type EventTarget, which doesn't have a value property. By casting it to an HTMLInputElement, we can access the value property.
+      const tagValue = tagInput.value.trim(); // Trim the value to remove any leading or trailing whitespace.
+
+      if (tagValue !== '') {
+        if (tagValue.length > 10) {
+          return form.setError('tags', {
+            type: 'required',
+            message: 'Tag should be less than 10 characters',
+          });
+        }
+        // Check if the tag already exists in the tags array.
+        if (!field.value.includes(tagValue as never)) {
+          // Set the tag values by spreading out the actual values and then passing the new tagValue.
+          form.setValue('tags', [...field.value, tagValue]);
+          tagInput.value = ''; // Clear the input field after adding the tag.
+          form.clearErrors('tags'); // Clear the error message if there was any.
+        }
+      } else {
+        form.trigger();
+      }
+    }
+  };
 
   return (
     <Form {...form}>
@@ -125,7 +157,7 @@ const Question = () => {
             </FormItem>
           )}
         />
-
+        {/* TAGS */}
         <FormField
           control={form.control}
           name="tags"
@@ -135,11 +167,34 @@ const Question = () => {
                 Tags <span className="text-red-500">*</span>
               </FormLabel>
               <FormControl className="mt-3.5">
-                <Input
-                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
-                  {...field}
-                  placeholder="Add tags..."
-                />
+                {/* FormControl can only take one things we have to use react fragments here: */}
+                <>
+                  <Input
+                    className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                    placeholder="Add tags..."
+                    onKeyDown={(e) => handleInputKeyDown(e, field)}
+                  />
+
+                  {field.value.length > 0 && (
+                    <div className="flex-start mt-2.5 gap-2.5">
+                      {field.value.map((tag: any) => (
+                        <Badge
+                          key={tag}
+                          className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize"
+                        >
+                          {tag}
+                          <Image
+                            src="/assets/icons/close.svg"
+                            alt="close icon"
+                            width={12}
+                            height={12}
+                            className="cursor-pointer object-contain invert-0 dark:invert"
+                          />
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </>
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500">
                 Add up to three tags most aligned to your question. Press enter
