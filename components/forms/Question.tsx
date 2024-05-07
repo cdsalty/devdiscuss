@@ -71,6 +71,14 @@ const Question = () => {
     }
   };
 
+  const handleTagRemove = (tag: string, field: any) => {
+    // only remove the tag that is clicked on...
+    // create a new instance that is set to all the tags except the one that was clicked on.
+    const newTags = field.value.filter((t: string) => t !== tag);
+    // update the tags field with the newTags. To do this, use the setValue method from the form object.
+    form.setValue('tags', newTags);
+  };
+
   return (
     <Form {...form}>
       <form
@@ -181,6 +189,7 @@ const Question = () => {
                         <Badge
                           key={tag}
                           className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize"
+                          onClick={() => handleTagRemove(tag, field)}
                         >
                           {tag}
                           <Image
@@ -217,3 +226,13 @@ const Question = () => {
 };
 
 export default Question;
+
+/*
+To Remove a badge:
+- add an onclick event to the badge. It should accept a function called handleTagRemove()
+  - handleTagRemove should accept the tag and field value. 
+    - onClick={handleTagRemove(tag, field)}
+
+- Next, we ONLY want to remove the tag that is clicked on. To achieve this, we create a new instance of the tags array that is set to all the tags except the one that was clicked on.
+
+*/
