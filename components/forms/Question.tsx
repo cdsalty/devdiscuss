@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -20,9 +20,12 @@ import { QuestionsSchema } from '@/lib/validations';
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
 
+const type: any = 'create';
+
 const Question = () => {
   // Establish a reference to the editor.
-  const editorRef = useRef(null); // This is so you don't have to manually track every keystroke. You can just extract the value from it later on.
+  const editorRef = useRef(null); // to prevent having to manually track every keystroke.
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof QuestionsSchema>>({
@@ -34,9 +37,16 @@ const Question = () => {
     },
   });
 
-  // 2. Define a submit handler.
+  // 2. Define a submit handler. -> will make use of state for isSubmitting
   function onSubmit(values: z.infer<typeof QuestionsSchema>) {
+    setIsSubmitting(true); // always a good measure to have to prevent multiple submissions
     // Do something with the form values.
+    try {
+      // ready for server actions!
+    } catch (error) {
+    } finally {
+      setIsSubmitting(false);
+    }
     // ✅ This will be type-safe and validated.
     console.log(values);
   }
@@ -49,7 +59,7 @@ const Question = () => {
       e.preventDefault();
 
       const tagInput = e.target as HTMLInputElement; // This is necessary because the target of the event is of type EventTarget, which doesn't have a value property. By casting it to an HTMLInputElement, we can access the value property.
-      const tagValue = tagInput.value.trim(); // Trim the value to remove any leading or trailing whitespace.
+      const tagValue = tagInput.value.trim();
 
       if (tagValue !== '') {
         if (tagValue.length > 10) {
@@ -103,7 +113,7 @@ const Question = () => {
                 Be Specific with your question(s). It is important to always ask
                 a question that is clear and concise.
               </FormDescription>
-              {/* FormMessage is for showing the error */}
+              {/* FormMessage is used to show any error messages */}
               <FormMessage className="text-red-500" />
             </FormItem>
           )}
@@ -218,6 +228,11 @@ const Question = () => {
           type="submit"
           className="primary-gradient w-fit !text-light-900"
         >
+          {isSubmitting ? (
+            <>{type === 'edit' ? 'Editing...' : 'Posting...'}</>
+          ) : (
+            <>{type === 'edit' ? 'Edit Question' : 'Ask a Question'}</>
+          )}
           Submit
         </Button>
       </form>
@@ -228,11 +243,21 @@ const Question = () => {
 export default Question;
 
 /*
-To Remove a badge:
-- add an onclick event to the badge. It should accept a function called handleTagRemove()
-  - handleTagRemove should accept the tag and field value. 
-    - onClick={handleTagRemove(tag, field)}
 
-- Next, we ONLY want to remove the tag that is clicked on. To achieve this, we create a new instance of the tags array that is set to all the tags except the one that was clicked on.
+function onSubmit(values: z.infer<typeof QuestionsSchema>) {
+  setIsSubmitting(true); // always a good measure to have to prevent multiple submissions
+  // Do something with the form values.
+  try {
+    // two things to try: 1) to edit a question, or 2) to create a question
+    // make an async call to the server to create a question; needs to contain all form data. ---> ready for server actions!
+    // Navigate to the homepage
+  } catch (error) {
+  } finally {
+    setIsSubmitting(false);
+  }
+  // ✅ This will be type-safe and validated.
+  console.log(values);
+}
+
 
 */
