@@ -19,6 +19,7 @@ import { Input } from '../ui/input';
 import { QuestionsSchema } from '@/lib/validations';
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
+import { createQuestion } from '@/lib/actions/question.action';
 
 const type: any = 'create';
 
@@ -38,11 +39,12 @@ const Question = () => {
   });
 
   // 2. Define a submit handler. -> will make use of state for isSubmitting
-  function onSubmit(values: z.infer<typeof QuestionsSchema>) {
+  async function onSubmit(values: z.infer<typeof QuestionsSchema>) {
     setIsSubmitting(true); // always a good measure to have to prevent multiple submissions
     // Do something with the form values.
     try {
       // ready for server actions!
+      await createQuestion({});
     } catch (error) {
     } finally {
       setIsSubmitting(false);
@@ -133,6 +135,8 @@ const Question = () => {
                   apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
                   // @ts-ignore
                   onInit={(_evt, editor) => (editorRef.current = editor)}
+                  onBlur={field.onBlur}
+                  onEditorChange={(content) => field.onChange(content)}
                   initialValue=""
                   init={{
                     height: 350,
@@ -259,5 +263,7 @@ function onSubmit(values: z.infer<typeof QuestionsSchema>) {
   console.log(values);
 }
 
+
+onBlur: Used to save the values when you exit the input field.
 
 */
