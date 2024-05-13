@@ -245,25 +245,3 @@ const Question = () => {
 };
 
 export default Question;
-
-/*
-
-function onSubmit(values: z.infer<typeof QuestionsSchema>) {
-  setIsSubmitting(true); // always a good measure to have to prevent multiple submissions
-  // Do something with the form values.
-  try {
-    // two things to try: 1) to edit a question, or 2) to create a question
-    // make an async call to the server to create a question; needs to contain all form data. ---> ready for server actions!
-    // Navigate to the homepage
-  } catch (error) {
-  } finally {
-    setIsSubmitting(false);
-  }
-  // ✅ This will be type-safe and validated.
-  console.log(values);
-}
-
-
-onBlur: Used to save the values when you exit the input field.
-
-*/
