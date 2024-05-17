@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '../ui/input';
 import { QuestionsSchema } from '@/lib/validations';
@@ -23,12 +24,20 @@ import { createQuestion } from '@/lib/actions/question.action';
 
 const type: any = 'create';
 
-const Question = () => {
+interface MongoUserProps {
+  mongoUserId: string;
+}
+
+const Question = ({ mongoUserId }: MongoUserProps) => {
+  const router = useRouter();
+
+  // eslint-disable-next-line no-unused-vars
+  const path = usePathname();
   // Establish a reference to the editor.
   const editorRef = useRef(null); // to prevent having to manually track every keystroke.
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 1. Define your form.
+  // 1. Define the form.
   const form = useForm<z.infer<typeof QuestionsSchema>>({
     resolver: zodResolver(QuestionsSchema),
     defaultValues: {
@@ -38,13 +47,21 @@ const Question = () => {
     },
   });
 
-  // 2. Define a submit handler. -> will make use of state for isSubmitting
+  // 2. Define a submit handler. -> will use state for isSubmitting
   async function onSubmit(values: z.infer<typeof QuestionsSchema>) {
     setIsSubmitting(true); // always a good measure to have to prevent multiple submissions
     // Do something with the form values.
     try {
       // ready for server actions!
-      await createQuestion({});
+      await createQuestion({
+        title: values.title,
+        content: values.explanation,
+        tags: values.tags,
+        // NOTE: Had to create a user server action to get the user by the clerk ID before I could pass it in here.
+        author: JSON.parse(mongoUserId),
+      });
+      // Navigate to homepage after submitting the question.
+      router.push('/');
     } catch (error) {
     } finally {
       setIsSubmitting(false);
@@ -237,7 +254,6 @@ const Question = () => {
           ) : (
             <>{type === 'edit' ? 'Edit Question' : 'Ask a Question'}</>
           )}
-          Submit
         </Button>
       </form>
     </Form>

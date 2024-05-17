@@ -6,7 +6,7 @@ export interface IQuestion extends Document {
   content: string;
   tags: Schema.Types.ObjectId[];
   views: number;
-  upvotes: Schema.Types.ObjectId[]; // a Mongoose schema to define a field that can hold an array of ObjectIds, which are references to other documents in the MongoDB collection.
+  upvotes: Schema.Types.ObjectId[]; // a Mongoose schema to define a field that can hold an array of ObjectIds, which will reference other documents in the MongoDB collection.
   downvotes: Schema.Types.ObjectId[];
   author: Schema.Types.ObjectId[];
   answers: Schema.Types.ObjectId[];
@@ -27,7 +27,6 @@ const QuestionSchema = new Schema({
 
 // Convert and export the schema to a model
 // make sure to check if it exists and if not, create it
-const Question =
-  models.Question || model<IQuestion>('Question', QuestionSchema);
+const Question = models.Question || model('Question', QuestionSchema);
 
 export default Question;
