@@ -32,7 +32,7 @@ const Question = ({ mongoUserId }: MongoUserProps) => {
   const router = useRouter();
 
   // eslint-disable-next-line no-unused-vars
-  const path = usePathname();
+  const pathname = usePathname();
   // Establish a reference to the editor.
   const editorRef = useRef(null); // to prevent having to manually track every keystroke.
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,8 +57,8 @@ const Question = ({ mongoUserId }: MongoUserProps) => {
         title: values.title,
         content: values.explanation,
         tags: values.tags,
-        // NOTE: Had to create a user server action to get the user by the clerk ID before I could pass it in here.
         author: JSON.parse(mongoUserId),
+        path: pathname,
       });
       // Navigate to homepage after submitting the question.
       router.push('/');
@@ -112,7 +112,7 @@ const Question = ({ mongoUserId }: MongoUserProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex w-full flex-col gap-10"
+        className="flex w-full flex-col gap-10 pt-6"
       >
         <FormField
           control={form.control}

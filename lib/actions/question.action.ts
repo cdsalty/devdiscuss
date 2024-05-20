@@ -1,16 +1,36 @@
 /* eslint-disable no-empty */
 'use server';
 
+import { connectToDatabase } from './mongoose';
 import Question from '@/database/question.model';
 import Tag from '@/database/tag.model';
-import { connectToDatabase } from './mongoose';
+import User from '@/database/user.model';
+import { CreateQuestionParams, GetQuestionsParams } from './shared.types';
+import { revalidatePath } from 'next/cache';
 
-export async function createQuestion(params: any) {
+export async function getQuestions(params: GetQuestionsParams) {
+  try {
+    connectToDatabase();
+    const questions = await Question.find({})
+      .populate({ path: 'tags', model: Tag }) // .populate() allows you to reference the name of the field that you want to populate from the objectid so they can be displayed in the frontend (mongodb gives us only the ObjectId, but we want the actual tag name... This is where .populate comes in.)
+      .populate({ path: 'author', model: User })
+      .sort({ createdAt: -1 }); // sort by createdAt in descending order (newest first
+    return { questions };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function createQuestion(params: CreateQuestionParams) {
   try {
     connectToDatabase();
     // eslint-disable-next-line no-unused-vars
     const { title, content, tags, author, path } = params;
-
+    console.log(
+      'This is the "path", that is being passed down as a prop from Question HOME to the createQuestion action: ' +
+        path
+    );
     // CREATE question
     const question = await Question.create({
       title,
@@ -44,6 +64,8 @@ export async function createQuestion(params: any) {
     // TODO: Create an interaction record for the user's "ask_question action"
 
     // TODO: Create scoring system; Increment the author's reputation by 5 points for creating a question
+
+    revalidatePath(path);
   } catch (error) {}
 }
 
